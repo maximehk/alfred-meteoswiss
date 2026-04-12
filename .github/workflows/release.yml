@@ -1,0 +1,31 @@
+name: Release
+ 
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest  # needs PlistBuddy
+    steps:
+      - uses: actions/checkout@v4
+ 
+      - name: Set version from tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          /usr/libexec/PlistBuddy -c "Set :version $VERSION" info.plist
+          echo "Building version $VERSION"
+ 
+      - name: Build workflow
+        run: zip -j MeteoSwiss.alfredworkflow info.plist meteoswiss.py
+ 
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: MeteoSwiss.alfredworkflow
+          generate_release_notes: true
+ 
+

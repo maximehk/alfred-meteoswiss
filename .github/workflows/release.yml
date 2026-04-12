@@ -3,7 +3,10 @@ name: Release
 on:
   push:
     tags: ['v*']
- 
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-latest  # needs PlistBuddy

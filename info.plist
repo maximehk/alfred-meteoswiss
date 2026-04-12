@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.user.meteoswiss</string>
+	<key>category</key>
+	<string>Tools</string>
+	<key>connections</key>
+	<dict>
+		<key>SCRIPTFILTER_UID</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>OPENURL_UID</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>User</string>
+	<key>description</key>
+	<string>Search MeteoSwiss local forecasts by postal code or place name</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>MeteoSwiss Forecast</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Fetching forecast…</string>
+				<key>script</key>
+				<string>export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+uv run --quiet "./meteoswiss.py" "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>Enter a postal code or place name</string>
+				<key>title</key>
+				<string>MeteoSwiss</string>
+				<key>type</key>
+				<integer>5</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>SCRIPTFILTER_UID</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>OPENURL_UID</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>## MeteoSwiss Forecast
+
+Search Swiss local weather forecasts by postal code or place name.
+
+### Setup
+
+The script uses `uv` (https://docs.astral.sh/uv/) to manage dependencies automatically.
+
+1. Install uv if you haven't: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+2. Edit the Script Filter in this workflow and update the `uv` path if needed.
+   - Default path assumed: `/Users/Shared/.local/bin/uv`  
+   - Find your actual path with: `which uv` in Terminal
+   - Common paths: `~/.local/bin/uv` or `/opt/homebrew/bin/uv`
+
+### Usage
+
+Type `meteo` followed by a space and:
+- A postal code: `meteo 8800` → Thalwil, Rüschlikon, …  
+- A place name: `meteo thalwil` → Thalwil (8800)
+
+Press Enter to open the forecast in your browser.
+
+### How it works
+
+- The MeteoSwiss API returns matching localities as semicolon-delimited strings
+- Results are cached per 2-digit prefix for 1 hour to avoid hammering the API
+- Dependencies (Alfred-PyWorkflow) are auto-installed by `uv` on first run
+</string>
+	<key>uidata</key>
+	<dict>
+		<key>OPENURL_UID</key>
+		<dict>
+			<key>xpos</key>
+			<real>450.0</real>
+			<key>ypos</key>
+			<real>150.0</real>
+		</dict>
+		<key>SCRIPTFILTER_UID</key>
+		<dict>
+			<key>xpos</key>
+			<real>150.0</real>
+			<key>ypos</key>
+			<real>150.0</real>
+		</dict>
+	</dict>
+	<key>variables</key>
+	<dict>
+		<key>keyword</key>
+		<string>w</string>
+	</dict>
+	<key>version</key>
+	<string>0.0.1</string>
+	<key>webaddress</key>
+	<string></string>
+</dict>
+</plist>

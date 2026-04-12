@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.user.meteoswiss</string>
+	<string>ch.maxhk.alfred.meteoswiss</string>
 	<key>category</key>
 	<string>Tools</string>
 	<key>connections</key>
@@ -23,7 +23,7 @@
 		</array>
 	</dict>
 	<key>createdby</key>
-	<string>User</string>
+	<string>Maxime HK</string>
 	<key>description</key>
 	<string>Search MeteoSwiss local forecasts by postal code or place name</string>
 	<key>disabled</key>
@@ -103,34 +103,52 @@ uv run --quiet "./meteoswiss.py" "$1"</string>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>## MeteoSwiss Forecast
+	<string>Search Swiss local weather forecasts from [MeteoSwiss](https://www.meteoswiss.admin.ch) by postal code or place name.
 
-Search Swiss local weather forecasts by postal code or place name.
+## Usage
 
-### Setup
+Trigger with the keyword `weather` (configurable in the workflow's Configure panel) followed by:
 
-The script uses `uv` (https://docs.astral.sh/uv/) to manage dependencies automatically.
+- **A postal code** — `weather 8001` → Zürich, …
+- **A place name** — `weather basel` → Basel (4001)
 
-1. Install uv if you haven't: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-2. Edit the Script Filter in this workflow and update the `uv` path if needed.
-   - Default path assumed: `/Users/Shared/.local/bin/uv`  
-   - Find your actual path with: `which uv` in Terminal
-   - Common paths: `~/.local/bin/uv` or `/opt/homebrew/bin/uv`
+Press Enter on a result to open its local forecast in your browser. The place-name search is fuzzy and diacritic-insensitive (`zurich` matches `Zürich`).
 
-### Usage
+## Setup
 
-Type `meteo` followed by a space and:
-- A postal code: `meteo 8001` → Zürich, …
-- A place name: `meteo basel` → Basel (4001)
+Dependencies are managed by [`uv`](https://docs.astral.sh/uv/) — no manual `pip install` required.
 
-Press Enter to open the forecast in your browser.
+1. Install `uv`: `curl -LsSf https://astral.sh/uv/install.sh | sh`
+2. If `uv` is not found at runtime, edit the Script Filter and adjust `PATH`. Find your `uv` location with `which uv` (commonly `~/.local/bin/uv` or `/opt/homebrew/bin/uv`).
 
-### How it works
+Requires Python ≥ 3.9 (managed automatically by `uv`).
 
-- The MeteoSwiss API returns matching localities as semicolon-delimited strings
-- Results are cached per 2-digit prefix for 1 hour to avoid hammering the API
-- Dependencies (Alfred-PyWorkflow) are auto-installed by `uv` on first run
+Source &amp; issues: https://github.com/maximehk/alfred-meteoswiss
 </string>
+	<key>userconfigurationconfig</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>weather</string>
+				<key>placeholder</key>
+				<string>weather</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Keyword used to trigger the MeteoSwiss search.</string>
+			<key>label</key>
+			<string>Keyword</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword</string>
+		</dict>
+	</array>
 	<key>uidata</key>
 	<dict>
 		<key>OPENURL_UID</key>
@@ -151,11 +169,11 @@ Press Enter to open the forecast in your browser.
 	<key>variables</key>
 	<dict>
 		<key>keyword</key>
-		<string>w</string>
+		<string>weather</string>
 	</dict>
 	<key>version</key>
-	<string>0.0.1</string>
+	<string>1.0.0</string>
 	<key>webaddress</key>
-	<string></string>
+	<string>https://github.com/maximehk/alfred-meteoswiss</string>
 </dict>
 </plist>

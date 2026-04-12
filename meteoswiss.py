@@ -91,7 +91,7 @@ def main(wf):
             entries = wf.cached_data(
                 cache_key,
                 lambda: fetch_results(prefix),
-                max_age=3600,
+                max_age=86400,
             )
         except Exception as exc:
             wf.add_item("Error fetching data: {}".format(exc), valid=False)

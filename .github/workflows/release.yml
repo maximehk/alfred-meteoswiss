@@ -20,7 +20,7 @@ jobs:
           echo "Building version $VERSION"
  
       - name: Build workflow
-        run: zip -j MeteoSwiss.alfredworkflow info.plist meteoswiss.py
+        run: zip -j MeteoSwiss.alfredworkflow info.plist meteoswiss.py icon.png
  
       - name: Create release
         uses: softprops/action-gh-release@v2

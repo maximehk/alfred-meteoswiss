@@ -1,15 +1,13 @@
-# /// script
-# requires-python = ">=3.9"
-# dependencies = ["Alfred-PyWorkflow"]
-# ///
+#!/usr/bin/env python3
 """MeteoSwiss local forecast search for Alfred 5."""
 
 import sys
 import json
+import os
+import time
 import unicodedata
 import urllib.request
 import urllib.error
-from workflow import Workflow
 
 BASE_URL = "https://www.meteoschweiz.admin.ch/static/resources/local-forecast-search/{prefix}.json"
 FORECAST_BASE = "https://www.meteoswiss.admin.ch"
@@ -33,6 +31,42 @@ def fetch_results(prefix):
         if e.code == 404:
             return []
         raise
+
+
+def _cache_dir():
+    d = os.environ.get("alfred_workflow_cache", os.path.expanduser("~/.cache/alfred-meteoswiss"))
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def cached_data(key, fetch_fn, max_age):
+    """Return cached data if fresh; call fetch_fn to refresh. max_age=0 means never expire."""
+    path = os.path.join(_cache_dir(), key + ".json")
+    if os.path.exists(path):
+        if max_age == 0 or (time.time() - os.path.getmtime(path)) < max_age:
+            with open(path) as f:
+                return json.load(f)
+    if fetch_fn is None:
+        return None
+    data = fetch_fn()
+    with open(path, "w") as f:
+        json.dump(data, f)
+    return data
+
+
+def _item(title, subtitle="", arg=None, valid=True, uid=None, copytext=None):
+    item = {"title": title, "subtitle": subtitle, "valid": valid}
+    if arg is not None:
+        item["arg"] = arg
+    if uid is not None:
+        item["uid"] = uid
+    if copytext is not None:
+        item["text"] = {"copy": copytext}
+    return item
+
+
+def send_feedback(items):
+    print(json.dumps({"items": items}))
 
 
 def normalize(s):
@@ -69,49 +103,38 @@ def fuzzy_score(query, text):
     return 0, False
 
 
-def main(wf):
-    query = wf.args[0].strip() if wf.args else ""
+def main():
+    query = sys.argv[1].strip() if len(sys.argv) > 1 else ""
 
     if not query:
-        wf.add_item(
+        send_feedback([_item(
             "MeteoSwiss Forecast",
             "Type a Swiss postal code (e.g. 8800) or place name",
             valid=False,
-        )
-        wf.send_feedback()
+        )])
         return
 
-    # Only fetch from MeteoSwiss when query is 1-2 chars (used as the prefix).
-    # For longer queries, read from the cache written by the last 1-2 char fetch.
     prefix = query[:2] if len(query) >= 2 else query[:1]
     cache_key = "meteo_{}".format(prefix)
 
     if len(query) <= 2:
         try:
-            entries = wf.cached_data(
-                cache_key,
-                lambda: fetch_results(prefix),
-                max_age=86400,
-            )
+            entries = cached_data(cache_key, lambda: fetch_results(prefix), max_age=86400)
         except Exception as exc:
-            wf.add_item("Error fetching data: {}".format(exc), valid=False)
-            wf.send_feedback()
+            send_feedback([_item("Error fetching data: {}".format(exc), valid=False)])
             return
     else:
-        # Serve from cache only — never hit the network
-        entries = wf.cached_data(cache_key, None, max_age=0)
+        # Serve from cache only — never hit the network for long queries
+        entries = cached_data(cache_key, None, max_age=0)
 
     if not entries:
-        wf.add_item(
+        send_feedback([_item(
             'No results for "{}"'.format(query),
             "Type 1-2 digits first to load localities" if len(query) > 2 else "No Swiss localities found with this prefix",
             valid=False,
-        )
-        wf.send_feedback()
+        )])
         return
 
-    # Filter: zip starts with query OR fuzzy match on name
-    q_lower = query.lower()
     if query.isdigit():
         matches = sorted(
             [e for e in entries if e.get("zip", "").startswith(query)],
@@ -131,10 +154,10 @@ def main(wf):
         matches = [e for _, e in scored]
 
     if not matches:
-        wf.add_item('No results for "{}"'.format(query), valid=False)
-        wf.send_feedback()
+        send_feedback([_item('No results for "{}"'.format(query), valid=False)])
         return
 
+    items = []
     for entry in matches:
         name = entry.get("name", "?")
         canton = entry.get("canton", "")
@@ -142,18 +165,17 @@ def main(wf):
         en_path = entry.get("en", "")
         url = FORECAST_BASE + en_path + "#forecast-tab=detail-view" if en_path else ""
 
-        wf.add_item(
+        items.append(_item(
             title="{name}  ({zip})".format(name=name, zip=zip_code),
             subtitle="Canton {canton} — open MeteoSwiss local forecast".format(canton=canton),
             arg=url,
             valid=bool(url),
             uid=entry.get("id", name),
             copytext=url,
-        )
+        ))
 
-    wf.send_feedback()
+    send_feedback(items)
 
 
 if __name__ == "__main__":
-    wf = Workflow()
-    sys.exit(wf.run(main))
+    main()

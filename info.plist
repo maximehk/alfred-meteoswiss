@@ -60,18 +60,17 @@
 				<key>runningsubtext</key>
 				<string>Fetching forecast…</string>
 				<key>script</key>
-				<string>export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
-uv run --quiet "./meteoswiss.py" "$1"</string>
+				<string></string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
-				<string></string>
+				<string>meteoswiss.py</string>
 				<key>subtext</key>
 				<string>Enter a postal code or place name</string>
 				<key>title</key>
 				<string>MeteoSwiss</string>
 				<key>type</key>
-				<integer>5</integer>
+				<integer>8</integer>
 				<key>withspace</key>
 				<true/>
 			</dict>
@@ -116,12 +115,7 @@ Press Enter on a result to open its local forecast in your browser. The place-na
 
 ## Setup
 
-Dependencies are managed by [`uv`](https://docs.astral.sh/uv/) — no manual `pip install` required.
-
-1. Install `uv`: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-2. If `uv` is not found at runtime, edit the Script Filter and adjust `PATH`. Find your `uv` location with `which uv` (commonly `~/.local/bin/uv` or `/opt/homebrew/bin/uv`).
-
-Requires Python ≥ 3.9 (managed automatically by `uv`).
+No dependencies — uses Python 3, which is pre-installed on macOS. Just import the workflow and go.
 
 Source &amp; issues: https://github.com/maximehk/alfred-meteoswiss
 </string>
